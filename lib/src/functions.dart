@@ -75,6 +75,7 @@ Future<void> screenLock({
           correctString: correctString,
           screenLockConfig: screenLockConfig,
           secretsConfig: secretsConfig,
+          errorSecretsConfig: errorSecretsConfig,
           keyPadConfig: keyPadConfig,
           didCancelled:
               canCancel ? didCancelled ?? Navigator.of(context).pop : null,
