@@ -6,7 +6,10 @@ class SecretsConfig {
     this.spacing,
     this.spacingRatio = 0.05,
     this.padding = const EdgeInsets.only(top: 20, bottom: 50),
+    this.errorSpacing = 10,
+    this.errorTitle = 'Passwords do not match',
     this.secretConfig = const SecretConfig(),
+    this.errorTitleStyle,
   });
 
   /// Absolute space between secret widgets.
@@ -24,4 +27,12 @@ class SecretsConfig {
   final EdgeInsetsGeometry padding;
 
   final SecretConfig secretConfig;
+
+
+  /// Error title customization
+  final double? errorSpacing;
+
+  final String? errorTitle;
+
+  final TextStyle? errorTitleStyle;
 }

@@ -51,6 +51,7 @@ Future<void> screenLock({
   Widget? confirmTitle,
   ScreenLockConfig? screenLockConfig,
   SecretsConfig? secretsConfig,
+  SecretsConfig? errorSecretsConfig,
   KeyPadConfig? keyPadConfig,
   DelayBuilderCallback? delayBuilder,
   Widget? customizedButtonChild,

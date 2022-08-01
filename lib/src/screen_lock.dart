@@ -40,6 +40,7 @@ class ScreenLock extends StatefulWidget {
     Widget? confirmTitle,
     ScreenLockConfig? screenLockConfig,
     SecretsConfig? secretsConfig,
+    SecretsConfig? errorSecretsConfig,
     this.keyPadConfig,
     this.delayBuilder,
     this.customizedButtonChild,
@@ -56,6 +57,7 @@ class ScreenLock extends StatefulWidget {
             confirmTitle ?? const Text('Please enter confirm passcode.'),
         screenLockConfig = screenLockConfig ?? const ScreenLockConfig(),
         secretsConfig = secretsConfig ?? const SecretsConfig(),
+        errorSecretsConfig = errorSecretsConfig ?? secretsConfig,
         assert(maxRetries > -1),
         super(key: key);
 
@@ -113,6 +115,9 @@ class ScreenLock extends StatefulWidget {
 
   /// Configurations of [Secrets].
   final SecretsConfig secretsConfig;
+
+  /// Mismatch configurations of [Secrets].
+  final SecretsConfig? errorSecretsConfig;
 
   /// Configurations of [KeyPad].
   final KeyPadConfig? keyPadConfig;
@@ -341,6 +346,7 @@ class _ScreenLockState extends State<ScreenLock> {
               length: secretLength,
               input: inputController.currentInput,
               verifyStream: inputController.verifyInput,
+              errorConfig: widget.errorSecretsConfig,
             )
           : widget.secretsBuilder!(
               context,

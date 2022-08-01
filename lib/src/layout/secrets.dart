@@ -12,8 +12,10 @@ class SecretsWithShakingAnimation extends StatefulWidget {
     required this.length,
     required this.input,
     required this.verifyStream,
+    required this.errorConfig,
   }) : super(key: key);
   final SecretsConfig config;
+  final SecretsConfig? errorConfig;
   final int length;
   final ValueListenable<String> input;
   final Stream<bool> verifyStream;
@@ -30,14 +32,24 @@ class _SecretsWithShakingAnimationState
   late AnimationController _animationController;
   late StreamSubscription<bool> _verifySubscription;
 
+  SecretsConfig _config = const SecretsConfig();
+  var _didMismatch = false;
+
   @override
   void initState() {
     super.initState();
 
+    _config = widget.config;
     _verifySubscription = widget.verifyStream.listen((valid) {
       if (!valid) {
         // shake animation when invalid
         _animationController.forward();
+        if (widget.errorConfig != null) {
+          setState(() {
+            _config = widget.errorConfig!;
+            _didMismatch = true;
+          });
+        }
       }
     });
 
@@ -73,7 +85,8 @@ class _SecretsWithShakingAnimationState
       child: Secrets(
         input: widget.input,
         length: widget.length,
-        config: widget.config,
+        config: _config,
+        didMismatch: _didMismatch,
       ),
     );
   }
@@ -85,11 +98,13 @@ class Secrets extends StatefulWidget {
     this.config = const SecretsConfig(),
     required this.input,
     required this.length,
+    this.didMismatch = false,
   }) : super(key: key);
 
   final SecretsConfig config;
   final ValueListenable<String> input;
   final int length;
+  final bool didMismatch;
 
   @override
   State<Secrets> createState() => _SecretsState();
@@ -109,27 +124,53 @@ class _SecretsState extends State<Secrets> with SingleTickerProviderStateMixin {
     return ValueListenableBuilder<String>(
       valueListenable: widget.input,
       builder: (context, value, child) {
-        return Container(
-          padding: widget.config.padding,
-          child: Wrap(
-            spacing: _computeSpacing(context),
-            children: List.generate(
-              widget.length,
-              (index) {
-                if (value.isEmpty) {
-                  return Secret(
-                    config: widget.config.secretConfig,
-                    enabled: false,
-                  );
-                }
+        return SizedBox(
+          width: double.infinity,
+          child: Stack(
+            children: [
+              Align(
+                alignment: Alignment.topCenter,
+                child: Container(
+                  padding: widget.config.padding,
+                  child: Column(
+                    children: [
+                      Wrap(
+                        spacing: _computeSpacing(context),
+                        children: List.generate(
+                          widget.length,
+                          (index) {
+                            if (value.isEmpty) {
+                              return Secret(
+                                config: widget.config.secretConfig,
+                                enabled: false,
+                              );
+                            }
 
-                return Secret(
-                  config: widget.config.secretConfig,
-                  enabled: index < value.length,
-                );
-              },
-              growable: false,
-            ),
+                            return Secret(
+                              config: widget.config.secretConfig,
+                              enabled: index < value.length,
+                            );
+                          },
+                          growable: false,
+                        ),
+                      ),
+                      // SizedBox(height: 40),
+                    ],
+                  ),
+                ),
+              ),
+              if (widget.didMismatch)
+                Positioned.fill(
+                  top: widget.config.errorSpacing! + 30,
+                  child: Align(
+                    alignment: Alignment.topCenter,
+                    child: Text(
+                      widget.config.errorTitle!,
+                      style: widget.config.errorTitleStyle,
+                    ),
+                  ),
+                ),
+            ],
           ),
         );
       },

@@ -64,6 +64,14 @@ class _MyHomePageState extends State<MyHomePage> {
                     correctString: '1234',
                     didCancelled: Navigator.of(context).pop,
                     didUnlocked: Navigator.of(context).pop,
+                    errorSecretsConfig: const SecretsConfig(
+                      errorTitle: 'Пароли не совпадают',
+                      errorTitleStyle: TextStyle(color: Colors.red),
+                      errorSpacing: 40,
+                      secretConfig: SecretConfig(
+                        borderColor: Colors.red,
+                      ),
+                    ),
                   );
                 },
               ),
@@ -357,10 +365,10 @@ class _SecretsWithCustomAnimationState extends State<SecretsWithCustomAnimation>
   late Animation<double> _animation;
   late AnimationController _animationController;
 
+
   @override
   void initState() {
     super.initState();
-
     widget.verifyStream.listen((valid) {
       if (!valid) {
         // scale animation.
@@ -394,6 +402,7 @@ class _SecretsWithCustomAnimationState extends State<SecretsWithCustomAnimation>
     return ScaleTransition(
       scale: _animation,
       child: Secrets(
+        didMismatch: false,
         input: widget.input,
         length: widget.length,
         config: widget.config,
